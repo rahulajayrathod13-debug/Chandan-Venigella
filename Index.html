@@ -32,6 +32,7 @@
     background:var(--cream);
     z-index:200;
   }
+  body.menu-open header{display:none;}
   .brand-mark{line-height:1;color:var(--gold);}
   .brand-mark .line1{
     font-family:'Playfair Display',serif;font-style:italic;font-weight:600;
@@ -61,7 +62,7 @@
   .nav-links{display:grid;grid-template-columns:1fr 1px 1fr;width:100%;max-width:560px;border-top:1px solid rgba(201,171,130,.35);padding-top:34px;text-align:center;gap:0 28px;}
   .nav-col{display:flex;flex-direction:column;gap:34px;}
   .nav-links .divider{background:rgba(201,171,130,.35);}
-  .nav-links a, .nav-links button.navlink{font-size:14px;letter-spacing:4px;text-transform:uppercase;color:var(--gold-light);transition:opacity .25s ease, letter-spacing .25s ease;}
+  .nav-links a, .nav-links button.navlink, .contact-toggle{font-size:14px;letter-spacing:4px;text-transform:uppercase;color:var(--gold-light);transition:opacity .25s ease, letter-spacing .25s ease;}
   .nav-links a:hover, .nav-links button.navlink:hover{opacity:.65;letter-spacing:5px;}
   .contact-toggle{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;}
   .contact-toggle .chev{font-size:11px;transition:transform .3s ease;}
@@ -110,27 +111,17 @@
     padding:22px;
     border-radius:2px;
     box-shadow:0 20px 50px rgba(58,38,32,.08);
+    overflow:hidden;
   }
   .strip-row{
     display:flex;
     gap:6px;
     height:280px;
-    overflow-x:auto;
-    scroll-snap-type:x mandatory;
-    -webkit-overflow-scrolling:touch;
-    scrollbar-width:none;
-    cursor:grab;
-    user-select:none;
   }
-  .strip-row::-webkit-scrollbar{display:none;}
-  .strip-row.dragging{cursor:grabbing;scroll-snap-type:none;}
   .strip-row img{
-    flex:0 0 auto;
-    width:220px;
+    flex:0 0 calc((100% - 12px) / 3);
     height:100%;
     object-fit:cover;
-    scroll-snap-align:start;
-    pointer-events:none;
   }
   .strip-btn{
     background:none;border:none;font:inherit;
@@ -191,7 +182,6 @@
   @media(min-width:720px){
     .hero-tagline{font-size:26px;letter-spacing:8px;}
     .strip-row{height:460px;}
-    .strip-row img{width:320px;}
     .brand-name{font-size:76px;}
     .brand-grid{max-width:900px;grid-template-columns:repeat(4,1fr);}
     .brand-grid img{height:420px;}
@@ -267,6 +257,8 @@
         <img src="https://picsum.photos/seed/cvstrip4/400/700" alt="Wedding ritual">
         <img src="https://picsum.photos/seed/cvstrip5/400/700" alt="Wedding ceremony">
         <img src="https://picsum.photos/seed/cvstrip6/400/700" alt="Bride close-up">
+        <img src="https://picsum.photos/seed/cvstrip1/400/700" alt="Wedding detail">
+        <img src="https://picsum.photos/seed/cvstrip2/400/700" alt="Bride portrait">
       </div>
     </div>
 
@@ -408,8 +400,8 @@
   const contactToggle = document.getElementById('contactToggle');
   const contactSub = document.getElementById('contactSub');
 
-  function openNav(){navOverlay.classList.add('open');hamburgerBtn.classList.add('open');document.body.style.overflow='hidden';}
-  function closeNav(){navOverlay.classList.remove('open');hamburgerBtn.classList.remove('open');document.body.style.overflow='';}
+  function openNav(){navOverlay.classList.add('open');hamburgerBtn.classList.add('open');document.body.classList.add('menu-open');document.body.style.overflow='hidden';}
+  function closeNav(){navOverlay.classList.remove('open');hamburgerBtn.classList.remove('open');document.body.classList.remove('menu-open');document.body.style.overflow='';}
   hamburgerBtn.addEventListener('click', ()=>{navOverlay.classList.contains('open') ? closeNav() : openNav();});
   navClose.addEventListener('click', closeNav);
 
@@ -433,50 +425,51 @@
     });
   });
 
-  // ---- Hero photo strip: scroll side-by-side on wheel / drag / PREV-NEXT ----
+  // ---- Hero photo strip: shows 3 images at a time, auto-advances every 3s ----
   const stripTrack = document.getElementById('stripTrack');
   const stripPrev = document.getElementById('stripPrev');
   const stripNext = document.getElementById('stripNext');
 
-  function scrollStrip(dir){
-    const img = stripTrack.querySelector('img');
-    const gap = 6;
-    const step = (img ? img.getBoundingClientRect().width : 220) + gap;
-    stripTrack.scrollBy({left: dir * step, behavior:'smooth'});
-  }
-  if(stripPrev) stripPrev.addEventListener('click', ()=>scrollStrip(-1));
-  if(stripNext) stripNext.addEventListener('click', ()=>scrollStrip(1));
-
-  // vertical mouse-wheel moves the strip horizontally
   if(stripTrack){
-    stripTrack.addEventListener('wheel', (e)=>{
-      if(Math.abs(e.deltaY) > Math.abs(e.deltaX)){
-        e.preventDefault();
-        stripTrack.scrollLeft += e.deltaY;
-      }
-    }, {passive:false});
+    const realCount = 6;   // original photos (excludes the 2 clones appended in the HTML)
+    let index = 0;
+    let timer = null;
 
-    // click-and-drag scrolling (desktop)
-    let isDown=false, startX=0, scrollLeftStart=0;
-    stripTrack.addEventListener('mousedown', (e)=>{
-      isDown = true;
-      stripTrack.classList.add('dragging');
-      startX = e.pageX - stripTrack.offsetLeft;
-      scrollLeftStart = stripTrack.scrollLeft;
-    });
-    ['mouseleave','mouseup'].forEach(evt=>{
-      stripTrack.addEventListener(evt, ()=>{
-        isDown = false;
-        stripTrack.classList.remove('dragging');
-      });
-    });
-    stripTrack.addEventListener('mousemove', (e)=>{
-      if(!isDown) return;
-      e.preventDefault();
-      const x = e.pageX - stripTrack.offsetLeft;
-      const walk = (x - startX) * 1.2;
-      stripTrack.scrollLeft = scrollLeftStart - walk;
-    });
+    function render(withTransition){
+      stripTrack.style.transition = withTransition ? 'transform .9s cubic-bezier(.65,.05,.36,1)' : 'none';
+      stripTrack.style.transform = `translateX(-${index * (100/3)}%)`;
+    }
+
+    function next(){
+      index++;
+      render(true);
+      if(index === realCount){
+        // we've scrolled onto the cloned images; snap back to the start invisibly
+        setTimeout(()=>{ index = 0; render(false); }, 900);
+      }
+    }
+
+    function prev(){
+      if(index === 0){
+        index = realCount;
+        render(false);
+        // force reflow so the "false" transition actually applies before animating
+        void stripTrack.offsetWidth;
+      }
+      index--;
+      render(true);
+    }
+
+    function resetTimer(){
+      if(timer) clearInterval(timer);
+      timer = setInterval(next, 3000);
+    }
+
+    if(stripNext) stripNext.addEventListener('click', ()=>{ next(); resetTimer(); });
+    if(stripPrev) stripPrev.addEventListener('click', ()=>{ prev(); resetTimer(); });
+
+    render(false);
+    resetTimer();
   }
 
   document.querySelector('.experience-cta').addEventListener('click', function(){
