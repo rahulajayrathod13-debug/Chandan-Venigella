@@ -33,6 +33,7 @@
     z-index:200;
   }
   body.menu-open header{display:none;}
+  body.subpage header{display:none;}
   .brand-mark{line-height:1;color:var(--gold);}
   .brand-mark .line1{
     font-family:'Playfair Display',serif;font-style:italic;font-weight:600;
@@ -77,12 +78,13 @@
   /* ===== HERO — matches the reference screenshot exactly ===== */
   .hero{
     position:relative;
-    padding:90px 20px 70px;
+    padding:44px 16px 50px;
     text-align:center;
     overflow:hidden;
   }
   .hero-bg{
     position:absolute;inset:0;
+    background-color:#ece3d4;
     background-image:url('https://picsum.photos/seed/cvheroportrait/1400/1600');
     background-size:cover;background-position:center 20%;
     opacity:.22;
@@ -97,31 +99,32 @@
     font-family:'Montserrat',sans-serif;
     font-weight:400;
     font-size:15px;
-    letter-spacing:6px;
+    letter-spacing:4px;
     text-transform:uppercase;
     color:#8a7a68;
-    line-height:2.1;
-    max-width:600px;
-    margin:0 auto 44px;
+    line-height:1.7;
+    max-width:420px;
+    margin:0 auto 28px;
   }
   .hero-strip{
     position:relative;z-index:2;
     max-width:1000px;margin:0 auto;
     background:#fff;
-    padding:22px;
+    padding:12px;
     border-radius:2px;
     box-shadow:0 20px 50px rgba(58,38,32,.08);
     overflow:hidden;
   }
   .strip-row{
     display:flex;
-    gap:6px;
-    height:280px;
+    gap:4px;
+    height:260px;
   }
   .strip-row img{
-    flex:0 0 calc((100% - 12px) / 3);
+    flex:0 0 calc((100% - 8px) / 3);
     height:100%;
     object-fit:cover;
+    background-color:#e5ddd0;
   }
   .strip-btn{
     background:none;border:none;font:inherit;
@@ -203,7 +206,7 @@
   footer .foot-note{font-size:10px;letter-spacing:1px;opacity:.5;}
 
   /* ===== INNER "PAGES" ===== */
-  .page{display:none;min-height:100vh;padding:90px 24px 100px;max-width:760px;margin:0 auto;text-align:center;}
+  .page{display:none;min-height:100vh;padding:64px 24px 100px;max-width:760px;margin:0 auto;text-align:center;}
   .page.active{display:block;}
   #home{display:block;}
   .page .eyebrow{margin-bottom:18px;}
@@ -219,7 +222,7 @@
   .contact-form button{margin-top:10px;padding:14px;background:var(--brown-deep);color:var(--cream);letter-spacing:3px;font-size:12px;text-transform:uppercase;}
 
   @media(min-width:720px){
-    .hero-tagline{font-size:26px;letter-spacing:8px;}
+    .hero-tagline{font-size:19px;letter-spacing:5px;max-width:520px;}
     .strip-row{height:460px;}
     .brand-name{font-size:76px;}
     .brand-grid{max-width:900px;grid-template-columns:repeat(4,1fr);}
@@ -529,7 +532,8 @@
     allPages.forEach(p=>p.classList.remove('active'));
     const target = document.getElementById(id);
     if(target){ target.classList.add('active'); }
-    window.scrollTo({top:0, behavior:'auto'});
+    document.body.classList.toggle('subpage', id !== 'home');
+    window.scrollTo(0, 0);
     closeNav();
   }
   document.querySelectorAll('[data-page]').forEach(el=>{
