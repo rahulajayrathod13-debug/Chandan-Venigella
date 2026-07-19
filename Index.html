@@ -28,9 +28,11 @@
   header{
     position:relative;
     display:flex;justify-content:space-between;align-items:center;
-    padding:26px 40px;
+    margin:0;
+    padding:22px 40px;
     background:var(--cream);
     z-index:200;
+    line-height:1;
   }
   body.menu-open header{display:none;}
   body.subpage header{display:none;}
@@ -75,27 +77,25 @@
   .nav-signature{font-family:'Alex Brush',cursive;font-size:34px;color:var(--gold-light);margin-top:56px;}
   .nav-socials{display:flex;gap:22px;margin-top:26px;font-size:15px;color:var(--gold-light);}
 
-  /* ===== HERO — matches the reference screenshot exactly ===== */
+  /* ===== HERO — full rewrite: flat structure, no wrapper divs, no stray spacing ===== */
+  main{display:block;margin:0;padding:0;}
   .hero{
-    position:relative;
-    padding:44px 16px 50px;
+    display:grid;
+    grid-template-rows:auto auto auto;
+    row-gap:18px;
+    margin:0;
+    padding:24px 16px 36px;
     text-align:center;
-    overflow:hidden;
-  }
-  .hero-bg{
-    position:absolute;inset:0;
     background-color:#ece3d4;
-    background-image:url('https://picsum.photos/seed/cvheroportrait/1400/1600');
-    background-size:cover;background-position:center 20%;
-    opacity:.22;
-    filter:sepia(.35) saturate(1.1);
-  }
-  .hero-bg::after{
-    content:"";position:absolute;inset:0;
-    background:linear-gradient(180deg, var(--cream-2) 0%, rgba(242,236,225,.85) 60%, var(--cream) 100%);
+    background-image:
+      linear-gradient(180deg, rgba(236,227,212,.92) 0%, rgba(242,236,225,.96) 100%),
+      url('https://picsum.photos/seed/cvheroportrait/1400/1600');
+    background-size:cover;
+    background-position:center 18%;
+    background-repeat:no-repeat;
   }
   .hero-tagline{
-    position:relative;z-index:2;
+    grid-row:1;
     font-family:'Montserrat',sans-serif;
     font-weight:400;
     font-size:15px;
@@ -104,24 +104,25 @@
     color:#8a7a68;
     line-height:1.7;
     max-width:420px;
-    margin:0 auto 28px;
+    margin:0 auto;
   }
   .hero-strip{
-    position:relative;z-index:2;
-    max-width:1000px;margin:0 auto;
+    grid-row:2;
+    max-width:1000px;
+    margin:0 auto;
     background:#fff;
-    padding:12px;
+    padding:14px;
     border-radius:2px;
     box-shadow:0 20px 50px rgba(58,38,32,.08);
     overflow:hidden;
   }
   .strip-row{
     display:flex;
-    gap:4px;
-    height:260px;
+    gap:5px;
+    aspect-ratio:2.2 / 1;
   }
   .strip-row img{
-    flex:0 0 calc((100% - 8px) / 3);
+    flex:0 0 calc((100% - 10px) / 3);
     height:100%;
     object-fit:cover;
     background-color:#e5ddd0;
@@ -132,11 +133,10 @@
     cursor:pointer;padding:0;
   }
   .strip-btn:hover{opacity:.6;}
-
   .hero-footer{
-    position:relative;z-index:2;
+    grid-row:3;
     display:flex;justify-content:space-between;align-items:center;
-    max-width:1000px;margin:34px auto 0;padding:0 8px;
+    max-width:1000px;width:100%;margin:0 auto;padding:0 8px;
   }
   .hero-footer .sig{font-family:'Alex Brush',cursive;font-size:36px;color:var(--brown-deep);}
   .hero-footer .prevnext{font-size:13px;letter-spacing:3px;color:var(--brown-deep);}
@@ -208,7 +208,7 @@
   /* ===== INNER "PAGES" ===== */
   .page{display:none;min-height:100vh;padding:64px 24px 100px;max-width:760px;margin:0 auto;text-align:center;}
   .page.active{display:block;}
-  #home{display:block;}
+  #home{display:block;padding:0;max-width:none;margin:0;text-align:left;}
   .page .eyebrow{margin-bottom:18px;}
   .page h1{font-family:'Playfair Display',serif;font-size:40px;color:var(--brown-deep);margin-bottom:30px;}
   .page p{font-family:'Cormorant Garamond',serif;font-size:19px;line-height:1.9;color:var(--brown);margin-bottom:22px;}
@@ -223,7 +223,6 @@
 
   @media(min-width:720px){
     .hero-tagline{font-size:19px;letter-spacing:5px;max-width:520px;}
-    .strip-row{height:460px;}
     .brand-name{font-size:76px;}
     .brand-grid{max-width:900px;grid-template-columns:repeat(4,1fr);}
     .brand-grid img{height:420px;}
@@ -288,12 +287,9 @@
 <!-- ============ HOME PAGE ============ -->
 <main id="home" class="page active">
 
-  <!-- HERO — matches the exact reference screenshot -->
+  <!-- HERO -->
   <section class="hero">
-    <div class="hero-bg"></div>
-    <div class="hero-tagline">
-      Destination Wedding<br>Photographers &amp; Filmmakers
-    </div>
+    <h1 class="hero-tagline">Destination Wedding<br>Photographers &amp; Filmmakers</h1>
 
     <div class="hero-strip">
       <div class="strip-row" id="stripTrack">
@@ -502,7 +498,7 @@
     <a href="#" data-page="book">Book an Appointment</a>
   </div>
   <div class="foot-note">© 2026 Chandan Venigella Photography — Hyderabad, India — Worldwide Availability</div>
-  <div class="foot-note" style="margin-top:8px;opacity:.3;">build v7 — 3-image hero frame, tight header spacing</div>
+  <div class="foot-note" style="margin-top:8px;opacity:.3;">build v8 — aspect-ratio hero frame (matches reference proportions)</div>
 </footer>
 
 <!-- Lightbox for Gallery Portfolio -->
